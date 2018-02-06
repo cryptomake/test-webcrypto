@@ -1,0 +1,53 @@
+<HTML>
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebCrypto Liner</title>
+    <script src="../../dist/webcrypto-liner.shim.js"></script>
+    <script src="../src/asmcrypto.min.js"></script>
+</head>
+
+<body>
+    <script>
+        function write_debug(txt) {
+            var div = document.createElement("div");
+            document.body.appendChild(div);
+            div.innerHTML = txt;
+        }
+        function test1() {
+            var key_data = new Uint8Array([
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+            ]);
+            crypto.subtle.importKey(
+                "raw", //can be "jwk" or "raw"
+                key_data.buffer,
+                { name: "AES-GCM", length: 256 },
+                true, // this should be the extractable flag
+                ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+            ).then(function (key_obj) {
+                console.log("Y2");
+                write_debug("Y2");
+                return crypto.subtle.exportKey("jwk", key_obj);
+            }).catch(function (err) {
+                console.error("Y3 error: ", err);
+                write_debug("Y3 error: " + err);
+            }).then(function (keydata) {
+                console.log("Y4");
+                write_debug("Y4");
+            }).catch(function (err) {
+                console.error("Y5 error: ", err);
+                write_debug("Y5 error: " + err);
+            });
+        }
+
+        function write_debug(txt) {
+            var div = document.createElement("div");
+            document.body.appendChild(div);
+            div.innerHTML = txt;
+        }
+        test1();
+    </script>
+</BODY>
+
+</HTML>
