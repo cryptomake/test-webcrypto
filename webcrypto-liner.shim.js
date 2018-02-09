@@ -2161,11 +2161,9 @@ var SubtleCrypto = /** @class */ (function (_super) {
             var browser = helper_1.BrowserInfo();
             if ((browser.name === helper_1.Browser.Edge && alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.AesGCM) ||
                 // Don't do AES-GCM key generation, because Edge throws errors on GCM encrypt, decrypt, wrapKey, unwrapKey
-                (alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.RsaOAEP && CheckAppleRsaOAEP())) {
-                alert("GenerateKey: RSA-OAEP JS");
+                CheckAppleRsaOAEP(alg.name)) {
                 return;
             }
-            alert("GenerateKey: RSA-OAEP Native");
             if (init_1.nativeSubtle) {
                 try {
                     return init_1.nativeSubtle.generateKey.apply(init_1.nativeSubtle, args)
@@ -2628,12 +2626,10 @@ var SubtleCrypto = /** @class */ (function (_super) {
                 try {
                     return init_1.nativeSubtle.exportKey.apply(init_1.nativeSubtle, args)
                         .catch(function (e) {
-                        alert(e.message);
                         helper_1.warn("WebCrypto: native 'exportKey' for " + key.algorithm.name + " doesn't work.", e && e.message || "Unknown message");
                     });
                 }
                 catch (e) {
-                    alert(e.message);
                     helper_1.warn("WebCrypto: native 'exportKey' for " + key.algorithm.name + " doesn't work.", e && e.message || "Unknown message");
                 }
             }
@@ -2698,6 +2694,11 @@ var SubtleCrypto = /** @class */ (function (_super) {
             // End: Fix
             if (ArrayBuffer.isView(keyData)) {
                 dataAny = webcrypto_core_2.PrepareData(keyData, "keyData");
+            }
+            if (CheckAppleRsaOAEP(alg.name)) {
+                // Don't use native importKey for RSA-OAEP on Safari before v11
+                // https://github.com/PeculiarVentures/webcrypto-liner/issues/53
+                return;
             }
             if (init_1.nativeSubtle) {
                 try {
@@ -2869,9 +2870,9 @@ function FixImportJwk(jwk) {
         delete jwk.alg;
     }
 }
-function CheckAppleRsaOAEP() {
+function CheckAppleRsaOAEP(algName) {
     var version = /AppleWebKit\/(\d+)/.exec(self.navigator.userAgent);
-    return (version && parseInt(version[1], 10) < 604);
+    return (algName.toUpperCase() === webcrypto_core_1.AlgorithmNames.RsaOAEP && version && parseInt(version[1], 10) < 604);
 }
 
 
