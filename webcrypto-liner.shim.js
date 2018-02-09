@@ -2159,6 +2159,7 @@ var SubtleCrypto = /** @class */ (function (_super) {
             .then(function (d) {
             alg = webcrypto_core_2.PrepareAlgorithm(algorithm);
             var browser = helper_1.BrowserInfo();
+            alert(self.navigator.userAgent);
             alert("GenerateKey: B:" + browser.name + " v" + browser.version);
             if ((browser.name === helper_1.Browser.Edge && alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.AesGCM) ||
                 // Don't do AES-GCM key generation, because Edge throws errors on GCM encrypt, decrypt, wrapKey, unwrapKey
