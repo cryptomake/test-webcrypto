@@ -2159,11 +2159,9 @@ var SubtleCrypto = /** @class */ (function (_super) {
             .then(function (d) {
             alg = webcrypto_core_2.PrepareAlgorithm(algorithm);
             var browser = helper_1.BrowserInfo();
-            alert(self.navigator.userAgent);
-            alert("GenerateKey: B:" + browser.name + " v" + browser.version);
             if ((browser.name === helper_1.Browser.Edge && alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.AesGCM) ||
                 // Don't do AES-GCM key generation, because Edge throws errors on GCM encrypt, decrypt, wrapKey, unwrapKey
-                (alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.RsaOAEP && browser.name === helper_1.Browser.Safari && parseInt(/^\d+/.exec(browser.version)[1], 10) < 11)) {
+                (alg.name.toUpperCase() === webcrypto_core_1.AlgorithmNames.RsaOAEP && CheckAppleRsaOAEP())) {
                 alert("GenerateKey: RSA-OAEP JS");
                 return;
             }
@@ -2870,6 +2868,10 @@ function FixImportJwk(jwk) {
         delete jwk.key_ops;
         delete jwk.alg;
     }
+}
+function CheckAppleRsaOAEP() {
+    var version = /AppleWebKit\/(\d+)/.exec(self.navigator.userAgent);
+    return (version && parseInt(version[1], 10) < 604);
 }
 
 
